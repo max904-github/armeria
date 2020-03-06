@@ -24,8 +24,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import javax.annotation.Nonnull;
-
 /**
  * Builds a {@link TokenBucket} instance using builder pattern.
  */
@@ -39,12 +37,20 @@ public class TokenBucketBuilder {
     /**
      * Adds a number of {@link BandwidthLimit}.
      */
-    public TokenBucketBuilder limits(@Nonnull BandwidthLimit... limits) {
+    public TokenBucketBuilder limits(BandwidthLimit... limits) {
+        requireNonNull(limits, "limits");
+        return limits(Arrays.asList(limits));
+    }
+
+    /**
+     * Adds a number of {@link BandwidthLimit}.
+     */
+    public TokenBucketBuilder limits(Iterable<? extends BandwidthLimit> limits) {
         requireNonNull(limits, "limits");
         if (this.limits.isEmpty()) {
             this.limits = new ArrayList<>(2);
         }
-        this.limits.addAll(Arrays.asList(limits));
+        limits.forEach(this.limits::add);
         return this;
     }
 

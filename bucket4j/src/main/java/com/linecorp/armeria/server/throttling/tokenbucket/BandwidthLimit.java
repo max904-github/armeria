@@ -105,6 +105,29 @@ public class BandwidthLimit {
     }
 
     /**
+     * Creates a new {@link BandwidthLimit} that computes {@code limit}, {@code overdraftLimit},
+     * {@code initialSize} and {@code period} from a semicolon-separated {@code specification} string
+     * that conforms to the following format:
+     * <pre>{@code
+     * <limit>;window=<period(in seconds)>[;burst=<overdraftLimit>][;initial=<initialSize>]
+     * }</pre>
+     * All {@code specification} string elements must come in the defined order.
+     * For example:
+     * <ul>
+     *   <li>{@code 100;window=60;burst=1000} ({@code limit}=100, {@code overdraftLimit}=1000,
+     *       {@code initialSize} and {@code period}=60seconds)</li>
+     *   <li>{@code 100;window=60;burst=1000;initial=20} ({@code limit}=100, {@code overdraftLimit}=1000,
+     *       {@code initialSize}=20 and {@code period}=60seconds)</li>
+     *   <li>{@code 5000;window=1} ({@code limit}=5000 and {@code period}=1second)</li>
+     * </ul>
+     *
+     * @param specification the specification used to create a {@link BandwidthLimit}
+     */
+    public static BandwidthLimit of(String specification) {
+        return TokenBucketSpec.parseBandwidthLimit(specification);
+    }
+
+    /**
      * The bucket size - defines the count of tokens which can be held by bucket
      * and defines the speed at which tokens are regenerated in bucket.
      * @return Bucket size.
@@ -166,22 +189,16 @@ public class BandwidthLimit {
     }
 
     /**
-     * Returns a string representation of the limit in the following format:
+     * Returns a string representation of the {@link BandwidthLimit} in the following format:
      * <pre>{@code
-     * <limit>;window=<period(in seconds)>;burst=<overdraftLimit>[;policy="token bucket"]
+     * <limit>;window=<period(in seconds)>[;burst=<overdraftLimit>][;policy="token bucket"]
      * }</pre>
      * For example: "100;window=60;burst=1000".
      *
-     * @return A {@link String} representation of the limit.
+     * @return A {@link String} representation of the {@link BandwidthLimit}.
+     * @see TokenBucketSpec#toString(BandwidthLimit)
      */
-    String toHeaderString() {
-        final StringBuilder sb = new StringBuilder()
-                .append(limit)
-                .append(";window=").append(period.getSeconds());
-        if (overdraftLimit > limit) {
-            sb.append(";burst=").append(overdraftLimit);
-        }
-        //sb.append(";policy=\"token bucket\"");
-        return sb.toString();
+    String toSpecString() {
+        return requireNonNull(TokenBucketSpec.toString(this));
     }
 }

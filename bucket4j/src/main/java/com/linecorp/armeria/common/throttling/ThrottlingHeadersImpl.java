@@ -14,21 +14,29 @@
  * under the License.
  */
 
-package com.linecorp.armeria.server.throttling.tokenbucket;
+package com.linecorp.armeria.common.throttling;
+
+import com.google.common.base.Ascii;
+
+import io.netty.util.AsciiString;
 
 final class ThrottlingHeadersImpl implements ThrottlingHeaders {
     private static final String LIMIT_SUFFIX = "-Limit";
     private static final String REMAINING_SUFFIX = "-Remaining";
     private static final String RESET_SUFFIX = "-Reset";
 
-    private final String limitHeader;
-    private final String remainingHeader;
-    private final String resetHeader;
+    private final AsciiString limitHeader;
+    private final AsciiString remainingHeader;
+    private final AsciiString resetHeader;
 
     ThrottlingHeadersImpl(final String scheme) {
-        limitHeader = scheme + LIMIT_SUFFIX;
-        remainingHeader = scheme + REMAINING_SUFFIX;
-        resetHeader = scheme + RESET_SUFFIX;
+        limitHeader = createHeaderName(scheme + LIMIT_SUFFIX);
+        remainingHeader = createHeaderName(scheme + REMAINING_SUFFIX);
+        resetHeader = createHeaderName(scheme + RESET_SUFFIX);
+    }
+
+    private static AsciiString createHeaderName(String name) {
+        return AsciiString.cached(Ascii.toLowerCase(name));
     }
 
     /**
@@ -36,7 +44,7 @@ final class ThrottlingHeadersImpl implements ThrottlingHeaders {
      * This header specifies the requests quota for the given time window.
      */
     @Override
-    public String limitHeader() {
+    public AsciiString limitHeader() {
         return limitHeader;
     }
 
@@ -45,7 +53,7 @@ final class ThrottlingHeadersImpl implements ThrottlingHeaders {
      * This header specifies the remaining requests quota for the current time window.
      */
     @Override
-    public String remainingHeader() {
+    public AsciiString remainingHeader() {
         return remainingHeader;
     }
 
@@ -55,7 +63,7 @@ final class ThrottlingHeadersImpl implements ThrottlingHeaders {
      * as a timestamp.
      */
     @Override
-    public String resetHeader() {
+    public AsciiString resetHeader() {
         return resetHeader;
     }
 }

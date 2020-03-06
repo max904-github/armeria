@@ -25,6 +25,7 @@ import javax.annotation.Nullable;
 
 import com.linecorp.armeria.common.HttpHeaderNames;
 import com.linecorp.armeria.common.Request;
+import com.linecorp.armeria.common.throttling.ThrottlingHeaders;
 import com.linecorp.armeria.server.ServiceRequestContext;
 import com.linecorp.armeria.server.throttling.ThrottlingStrategy;
 
@@ -77,7 +78,7 @@ public class TokenBucketThrottlingStrategy<T extends Request> extends Throttling
         minimumBackoffSeconds = (minimumBackoff == null) ? 0L : minimumBackoff.getSeconds();
         this.headersScheme = headersScheme;
         this.sendQuota = sendQuota;
-        quota = sendQuota ? tokenBucket.toHeaderString() : null;
+        quota = sendQuota ? tokenBucket.toSpecString() : null;
     }
 
     /**
@@ -101,7 +102,7 @@ public class TokenBucketThrottlingStrategy<T extends Request> extends Throttling
         }
         // reconfigure the bucket
         return asyncBucket.replaceConfiguration(builder.build())
-                          .thenRun(() -> quota = sendQuota ? tokenBucket.toHeaderString() : null);
+                          .thenRun(() -> quota = sendQuota ? tokenBucket.toSpecString() : null);
     }
 
     /**

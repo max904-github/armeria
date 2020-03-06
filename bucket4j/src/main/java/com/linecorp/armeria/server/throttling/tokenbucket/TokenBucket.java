@@ -18,9 +18,6 @@ package com.linecorp.armeria.server.throttling.tokenbucket;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -61,10 +58,29 @@ public class TokenBucket {
     }
 
     /**
-     * Creates a new {@link TokenBucketBuilder}.
+     * Creates a new {@link TokenBucketBuilder} using a builder.
      */
     public static TokenBucketBuilder builder() {
         return new TokenBucketBuilder();
+    }
+
+    /**
+     * Creates a new {@link TokenBucket} from a comma-separated {@code specification} string
+     * that conforms to the following format:
+     * <pre>{@code
+     * <bandwidth limit 1>[, <bandwidth limit 2>[, etc.]]
+     * }</pre>
+     * The order of elements inside {@code specification} is not defined.
+     * For example:
+     * <ul>
+     *   <li>{@code 100;window=60;burst=1000, 50000;window=3600}</li>
+     * </ul>
+     *
+     * @param specification the specification used to create a {@link BandwidthLimit}
+     * @see TokenBucketSpec#parseTokenBucket(String)
+     */
+    public static TokenBucket of(String specification) {
+        return TokenBucketSpec.parseTokenBucket(specification);
     }
 
     /**
@@ -85,7 +101,7 @@ public class TokenBucket {
     }
 
     @Nullable
-    private BandwidthLimit lowestLimit() {
+    BandwidthLimit lowestLimit() {
         BandwidthLimit lowestLimit = null;
         for (BandwidthLimit limit : limits) {
             if (lowestLimit == null) {
@@ -110,13 +126,11 @@ public class TokenBucket {
      * @return A {@link String} representation of the limits.
      */
     @Nullable
-    String toHeaderString() {
+    String toSpecString() {
         final BandwidthLimit lowestLimit = lowestLimit();
         if (limits.length == 0 || lowestLimit == null) {
             return null;
         }
-        return lowestLimit.limit() + ", " + Arrays.stream(limits)
-                                                  .map(BandwidthLimit::toHeaderString)
-                                                  .collect(Collectors.joining(", "));
+        return lowestLimit.limit() + ", " + requireNonNull(TokenBucketSpec.toString(this));
     }
 }

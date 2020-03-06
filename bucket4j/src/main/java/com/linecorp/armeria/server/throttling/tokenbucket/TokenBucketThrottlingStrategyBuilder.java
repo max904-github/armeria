@@ -21,6 +21,7 @@ import java.time.Duration;
 import javax.annotation.Nullable;
 
 import com.linecorp.armeria.common.Request;
+import com.linecorp.armeria.common.throttling.ThrottlingHeaders;
 
 /**
  * Builds {@link TokenBucketThrottlingStrategy}.

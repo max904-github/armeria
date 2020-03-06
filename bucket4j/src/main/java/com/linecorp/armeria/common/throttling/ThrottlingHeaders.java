@@ -14,7 +14,9 @@
  * under the License.
  */
 
-package com.linecorp.armeria.server.throttling.tokenbucket;
+package com.linecorp.armeria.common.throttling;
+
+import io.netty.util.AsciiString;
 
 /**
  * A RateLimit Header Scheme for HTTP.
@@ -58,18 +60,18 @@ public interface ThrottlingHeaders {
      * Returns the name of the "limit" throttling header for the given scheme, like "X-RateLimit-Limit".
      * This header specifies the requests quota for the given time window.
      */
-    String limitHeader();
+    AsciiString limitHeader();
 
     /**
      * Returns the name of the "remaining" throttling header for the given scheme, like "X-RateLimit-Remaining".
      * This header specifies the remaining requests quota for the current time window.
      */
-    String remainingHeader();
+    AsciiString remainingHeader();
 
     /**
      * Returns the name of the "reset" throttling header for the given scheme, like "X-RateLimit-Reset".
      * This header specifies the time remaining in the current window. Its value defined in seconds or
      * as a timestamp.
      */
-    String resetHeader();
+    AsciiString resetHeader();
 }
